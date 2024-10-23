@@ -17,14 +17,10 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $this->user()->id],
+            'cpf' => ['required', 'string', 'size:11', 'unique:users,cpf,' . $this->user()->id], // Validação do CPF
+            'telefone' => ['nullable', 'string', 'max:15'], // Validação do telefone
+            'endereco' => ['nullable', 'string', 'max:255'], // Validação do endereço
         ];
     }
 }
