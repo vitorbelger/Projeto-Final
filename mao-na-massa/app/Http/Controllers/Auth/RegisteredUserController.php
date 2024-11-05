@@ -39,8 +39,8 @@ class RegisteredUserController extends Controller
             'telefone' => ['required', 'string', 'max:15'],
             'endereco' => ['required', 'string', 'max:255'],
             'role' => ['required', Rule::in(['cliente', 'trabalhador'])],
-            'profissao' => 'required_if:role,trabalhador|string|max:255',
-            'curriculo' => 'nullable|string', // Mantemos como nullable
+            'profissao' => 'required_if:role,trabalhador|nullable|string|max:255',
+            'curriculo' => 'nullable|string|max:1000', // Ajuste para limitar o tamanho do campo se necessário
         ]);
 
         // Cria o usuário no banco
@@ -65,7 +65,12 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+        if ($user->role === 'cliente') {
+            return redirect()->route('dashboard');
+        } elseif ($user->role === 'trabalhador') {
+            return redirect()->route('worker-dashboard');
+        }
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard'); // ou qualquer outra rota padrão
     }
-}
+};

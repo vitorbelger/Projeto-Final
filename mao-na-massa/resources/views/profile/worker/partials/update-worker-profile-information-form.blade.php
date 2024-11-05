@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Profile Information') }}
+            {{ __('Informação do Perfil') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Atualize as Informações Pessoais da sua Conta.") }}
         </p>
     </header>
 
@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.worker.worker-edit') }}" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 
@@ -66,6 +66,36 @@
             <x-input-label for="endereco" :value="__('Endereço')" />
             <x-text-input id="endereco" name="endereco" type="text" class="mt-1 block w-full" :value="old('endereco', $user->endereco)" autocomplete="endereco" />
             <x-input-error class="mt-2" :messages="$errors->get('endereco')" />
+        </div>
+
+        <!-- Profissão -->
+        <div>
+            <x-input-label for="profissao" :value="__('Profissão')" />
+            <x-text-input id="profissao" class="block mt-1 w-full" type="text" name="profissao"
+                :value="old('profissao')" autofocus autocomplete="profissao" />
+            <x-input-error :messages="$errors->get('profissao')" class="mt-2" />
+        </div>
+
+        <!-- Currículo -->
+        <div class="mt-4">
+            <x-input-label for="curriculo" :value="__('Currículo')" />
+            <textarea id="curriculo" name="curriculo" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" rows="4">{{ old('curriculo') }}</textarea>
+            <x-input-error :messages="$errors->get('curriculo')" class="mt-2" />
+        </div>
+
+        <!-- Campo de Senha para Confirmação -->
+        <div class="mt-6">
+            <x-input-label for="password" value="{{ __('Senha') }}" />
+
+            <x-text-input
+                id="password"
+                name="password"
+                type="password"
+                class="mt-1 block w-3/4"
+                placeholder="{{ __('Senha') }}"
+                required
+            />
+            <x-input-error class="mt-2" :messages="$errors->get('password')" />
         </div>
 
         <div class="flex items-center gap-4">
