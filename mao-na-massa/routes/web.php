@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\AvaliacaoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 use App\Models\Worker;
@@ -46,17 +47,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Concluir solicitação
     Route::patch('/solicitacoes/{solicitacao}/atualizar', [WorkerController::class, 'atualizarSolicitacao'])
-    ->middleware(['auth', 'verified'])
-    ->name('solicitacoes.atualizar');
+        ->middleware(['auth', 'verified'])
+        ->name('solicitacoes.atualizar');
 
     Route::patch('/solicitacoes/{solicitacao}/finalizar', [WorkerController::class, 'finalizarSolicitacao'])
-    ->middleware(['auth', 'verified', CheckRole::class . ':trabalhador'])
-    ->name('solicitacoes.finalizar');
+        ->middleware(['auth', 'verified', CheckRole::class . ':trabalhador'])
+        ->name('solicitacoes.finalizar');
 
 
 
     //tela de registro para as solicitações
     Route::get('/solicitacoes', [WorkerController::class, 'registerSolicitacoes'])->name('solicitacoes.show');
+
+
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // Rotas de Avaliações
+        Route::get('/avaliacoes', [AvaliacaoController::class, 'index'])->name('avaliacoes.index');
+        Route::get('/avaliacoes/create/{solicitacao}', [AvaliacaoController::class, 'create'])->name('avaliacoes.create');
+        Route::post('/avaliacoes/{solicitacao}', [AvaliacaoController::class, 'store'])->name('avaliacoes.store');
+
+        // Rotas específicas para Cliente e Trabalhador
+        Route::get('/avaliacoes/cliente', [AvaliacaoController::class, 'cliente'])->name('avaliacoes.cliente');
+        Route::get('/avaliacoes/trabalhador', [AvaliacaoController::class, 'trabalhador'])->name('avaliacoes.trabalhador');
+    });
+
+
 
 
 

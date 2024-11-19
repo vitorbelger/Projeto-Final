@@ -55,4 +55,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Worker::class);
     }
+
+    public function mediaAvaliacoes()
+    {
+        return $this->hasMany(Avaliacao::class, 'avaliado_id')->avg('nota');
+    }
+
+
 }

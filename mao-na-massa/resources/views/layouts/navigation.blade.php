@@ -29,6 +29,35 @@
                 @endif
             </div>
 
+            <nav>
+                <!-- Outros itens de navegação -->
+                <div class="space-y-2">
+                    <!-- Link para avaliação do cliente (caso seja um cliente logado) -->
+                    @if (Auth::check() && Auth::user()->role === 'cliente')
+                        <a href="{{ route('avaliacoes.cliente') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                            Avaliar Trabalhadores
+                        </a>
+                    @endif
+
+                    <!-- navigation.blade.php -->
+                    @if (Auth::check())
+                        <x-nav-link :href="route('avaliacoes.index')" :active="request()->routeIs('avaliacoes.index')">
+                            {{ __('Minhas Avaliações') }}
+                        </x-nav-link>
+                    @endif
+
+
+                    <!-- Link para avaliação do trabalhador (caso seja um trabalhador logado) -->
+                    @if (Auth::check() && Auth::user()->role === 'trabalhador')
+                        <a href="{{ route('avaliacoes.trabalhador') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                            Avaliar Clientes
+                        </a>
+                    @endif
+                </div>
+            </nav>
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">

@@ -21,6 +21,7 @@ class Solicitacao extends Model
         'descricao',
         'data_inicio',
         'data_conclusao',
+        'data_finalizacao',
         'status',
     ];
 
@@ -28,12 +29,14 @@ class Solicitacao extends Model
     protected $casts = [
         'data_inicio' => 'date',
         'data_conclusao' => 'date',
+        'data_finalizacao' => 'date'
     ];
 
     // Define os valores de status como constantes
     const STATUS_PENDENTE = 'pendente';
     const STATUS_ACEITA = 'aceita';
     const STATUS_REJEITADA = 'rejeitada';
+    const STATUS_FINALIZADO = 'finalizado';
 
     // Relacionamento com o cliente (usuário que solicita o serviço)
     public function cliente()
@@ -63,5 +66,11 @@ class Solicitacao extends Model
     public function scopeRejeitadas($query)
     {
         return $query->where('status', self::STATUS_REJEITADA);
+    }
+
+    // Scope para filtrar solicitações finalizadas
+    public function scopeFinalizadas($query)
+    {
+        return $query->where('status', self::STATUS_FINALIZADO);
     }
 }
