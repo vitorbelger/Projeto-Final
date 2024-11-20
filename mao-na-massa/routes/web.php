@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\AvaliacaoController;
+use App\Http\Controllers\DenunciaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 use App\Models\Worker;
@@ -71,9 +72,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/avaliacoes/trabalhador', [AvaliacaoController::class, 'trabalhador'])->name('avaliacoes.trabalhador');
     });
 
-
-
-
+    //Rotas para denuncia
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/denuncias/create/{solicitacao}', [DenunciaController::class, 'create'])->name('denuncias.create');
+        Route::post('/denuncias/{solicitacao}', [DenunciaController::class, 'store'])->name('denuncias.store');
+        Route::get('/denuncias/cliente', [DenunciaController::class, 'cliente'])->name('denuncias.cliente');
+        Route::get('/denuncias/trabalhador', [DenunciaController::class, 'trabalhador'])->name('denuncias.trabalhador');
+    });
 
     // Rotas de Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

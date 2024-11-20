@@ -13,8 +13,17 @@ class AvaliacaoController extends Controller
     public function index()
     {
         $avaliacoes = Avaliacao::where('avaliado_id', Auth::id())->get();
+        $avaliacoes = Auth::user()->avaliacoesRecebidas;
+        // Verificar se o usuário tem avaliações
+        if ($avaliacoes->isEmpty()) {
+            $media = 0;  // Ou qualquer valor padrão que você preferir
+        } else {
+            // Calcular a média das avaliações
+            $media = $avaliacoes->avg('nota');
+        }
 
-        return view('avaliacoes.index', compact('avaliacoes'));
+
+        return view('avaliacoes.index', compact('avaliacoes','media'));
     }
 
     // Exibir a tela de avaliação
@@ -31,42 +40,39 @@ class AvaliacaoController extends Controller
     // Salvar a avaliação
     public function store(Request $request, Solicitacao $solicitacao)
     {
-        // Validar os dados da avaliação
+        // Verifica se já existe uma avaliação para a solicitação
+        $avaliacaoExistente = Avaliacao::where('solicitacao_id', $solicitacao->id)->exists();
+
+        if ($avaliacaoExistente) {
+            return redirect()->route('avaliacoes.index')
+                ->with('error', 'Esta solicitação já foi avaliada.');
+        }
+
+        // Validação dos dados
         $request->validate([
             'nota' => 'required|integer|min:0|max:5',
             'comentario' => 'nullable|string|max:255',
         ]);
 
-        // Verificar se a solicitação é finalizada
-        if ($solicitacao->status !== Solicitacao::STATUS_FINALIZADO) {
-            abort(403, 'Você só pode avaliar solicitações finalizadas.');
-        }
+        // Identifica os IDs do avaliador e do avaliado
+        $avaliadorId = Auth::id();
+        $avaliadoId = $solicitacao->worker_id
+            ? $solicitacao->worker->user->id
+            : $solicitacao->cliente->id;
 
-        // Criar a avaliação
-        $avaliacao = new Avaliacao();
-        $avaliacao->solicitacao_id = $solicitacao->id;
-        $avaliacao->avaliador_id = Auth::id(); // Quem está avaliando
+        // Criação da avaliação
+        Avaliacao::create([
+            'solicitacao_id' => $solicitacao->id,
+            'avaliador_id' => $avaliadorId,
+            'avaliado_id' => $avaliadoId,
+            'nota' => $request->nota,
+            'comentario' => $request->comentario,
+        ]);
 
-        // Definir o avaliado com base na relação da solicitação
-        if (Auth::id() === $solicitacao->user_id) {
-            // Se o avaliador for o cliente, o avaliado é o trabalhador
-            $avaliacao->avaliado_id = $solicitacao->worker->user_id;
-        } elseif (Auth::id() === $solicitacao->worker->user_id) {
-            // Se o avaliador for o trabalhador, o avaliado é o cliente
-            $avaliacao->avaliado_id = $solicitacao->cliente->id;
-        } else {
-            abort(403, 'Você não tem permissão para avaliar esta solicitação.');
-        }
-
-        // Atribuir os dados da avaliação
-        $avaliacao->nota = $request->input('nota');
-        $avaliacao->comentario = $request->input('comentario');
-        $avaliacao->save();
-
-        return redirect()
-            ->route('avaliacoes.index')
-            ->with('success', 'Avaliação enviada com sucesso!');
+        return redirect()->route('avaliacoes.index')
+            ->with('success', 'Avaliação realizada com sucesso!');
     }
+
 
     // Listar solicitações finalizadas que um cliente pode avaliar
     public function cliente()
@@ -84,7 +90,7 @@ class AvaliacaoController extends Controller
         $solicitacoes = Solicitacao::whereHas('worker', function ($query) {
             $query->where('user_id', Auth::id());
         })->where('status', Solicitacao::STATUS_FINALIZADO)
-          ->get();
+            ->get();
 
         return view('avaliacoes.trabalhador', compact('solicitacoes'));
     }

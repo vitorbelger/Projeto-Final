@@ -14,27 +14,31 @@
                         {{ auth()->id() === $solicitacao->user_id ? $solicitacao->worker->user->name : $solicitacao->cliente->name }}
                     </p>
 
-                    <form method="POST" action="{{ route('avaliacoes.store', $solicitacao) }}">
-                        @csrf
+                    @if ($solicitacao->avaliacao)
+                        <p>Esta solicitação já foi avaliada.</p>
+                    @else
+                        <form method="POST" action="{{ route('avaliacoes.store', $solicitacao) }}">
+                            @csrf
 
-                        <div class="mb-4">
-                            <label class="block text-gray-200">Nota (0 a 5)</label>
-                            <input type="number" name="nota" min="0" max="5"
-                                   class="mt-1 block w-full bg-gray-800 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                   required>
-                        </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-200">Nota (0 a 5)</label>
+                                <input type="number" name="nota" min="0" max="5"
+                                    class="mt-1 block w-full bg-gray-800 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                    required>
+                            </div>
 
-                        <div class="mb-4">
-                            <label class="block text-gray-200">Comentário</label>
-                            <textarea name="comentario"
-                                      class="mt-1 block w-full bg-gray-800 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
-                        </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-200">Comentário</label>
+                                <textarea name="comentario"
+                                    class="mt-1 block w-full bg-gray-800 text-white border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                            </div>
 
-                        <button type="submit"
+                            <button type="submit"
                                 class="btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                            Enviar Avaliação
-                        </button>
-                    </form>
+                                Enviar Avaliação
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

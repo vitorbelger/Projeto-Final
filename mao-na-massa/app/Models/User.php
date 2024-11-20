@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Worker;
+use App\Models\Avaliacao;
 
 class User extends Authenticatable
 {
@@ -61,5 +62,8 @@ class User extends Authenticatable
         return $this->hasMany(Avaliacao::class, 'avaliado_id')->avg('nota');
     }
 
-
+    public function avaliacoesRecebidas()
+    {
+        return $this->hasMany(Avaliacao::class, 'avaliado_id'); // Ajuste se necessário
+    }
 }

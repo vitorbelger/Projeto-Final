@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Worker;
 use App\Models\User;
+use App\Models\Avaliacao;
 use Illuminate\Notifications\Notifiable;
 
 class Solicitacao extends Model
 {
-    use HasFactory,Notifiable;
+    use HasFactory, Notifiable;
 
     protected $table = 'solicitacoes'; // Nome correto da tabela
 
@@ -49,6 +50,20 @@ class Solicitacao extends Model
     {
         return $this->belongsTo(Worker::class);
     }
+
+    //Relacionamento com Avaliação
+    public function avaliacao()
+    {
+        return $this->hasOne(Avaliacao::class);
+    }
+
+    //Relacionamento com Denuncia
+    //Relacionamento com Avaliação
+    public function denuncia()
+    {
+        return $this->hasOne(Denuncia::class);
+    }
+
 
     // Scope para filtrar solicitações pendentes
     public function scopePendentes($query)

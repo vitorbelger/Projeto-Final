@@ -11,6 +11,12 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-lg font-semibold mb-4">Avaliações Recebidas</h3>
 
+                    {{-- Exibe o nome e a média do usuário --}}
+                    <div class="mb-6">
+                        <p><strong>{{ auth()->user()->name }}</strong></p>
+                        <p><strong>Média de Avaliação:</strong> {{ number_format($media, 1) }} / 5</p>
+                    </div>
+
                     @if ($avaliacoes->isEmpty())
                         <p>Nenhuma avaliação recebida.</p>
                     @else
