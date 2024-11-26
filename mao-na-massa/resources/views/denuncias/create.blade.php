@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Denunciar Solicitação #{{ $solicitacao->id }}
+            Denunciar Solicitação {{ $solicitacao->id }}
         </h2>
     </x-slot>
 
@@ -12,11 +12,20 @@
                     <h3 class="text-lg font-semibold mb-4">Detalhes da Solicitação</h3>
 
                     <p><strong>Denunciado:</strong>
-                        {{ auth()->id() === $solicitacao->user_id ? $solicitacao->worker->user->name : $solicitacao->cliente->name }}
+                        @if (auth()->id() === $solicitacao->user_id)
+                            {{ $solicitacao->worker->user->name ?? 'Trabalhador não encontrado' }}
+                        @else
+                            {{ $solicitacao->cliente->name ?? 'Cliente não encontrado' }}
+                        @endif
                     </p>
 
-                    @if ($solicitacao->denuncia)
-                        <p class="mt-4 text-yellow-500">Esta solicitação já foi denunciada.</p>
+
+                    @php
+                        $denunciaFeita = $solicitacao->denuncia->where('denunciante_id', auth()->id())->isNotEmpty();
+                    @endphp
+
+                    @if ($denunciaFeita)
+                        <p class="mt-4 text-yellow-500">Você já denunciou esta solicitação.</p>
                     @else
                         <form method="POST" action="{{ route('denuncias.store', $solicitacao) }}" novalidate>
                             @csrf
@@ -33,8 +42,7 @@
                             </div>
 
                             {{-- Botão de Enviar --}}
-                            <button type="submit"
-                                class="btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                            <button type="submit" class="btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
                                 Enviar Denúncia
                             </button>
                         </form>

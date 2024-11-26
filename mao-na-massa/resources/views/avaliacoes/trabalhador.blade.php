@@ -12,11 +12,11 @@
                     <h3 class="text-lg font-semibold mb-4">Solicitações Finalizadas</h3>
 
                     @if ($solicitacoes->isEmpty())
-                        <p>Não há solicitações finalizadas para avaliar.</p>
+                        <p class="text-center text-gray-500">Não há solicitações finalizadas para avaliar.</p>
                     @else
                         <ul class="space-y-4">
                             @foreach ($solicitacoes as $solicitacao)
-                                <li class="border-b pb-4">
+                                <li class="border-b border-gray-300 dark:border-gray-600 py-4">
                                     <div class="flex justify-between items-center">
                                         <div>
                                             <strong>Cliente:</strong>
@@ -26,7 +26,7 @@
                                         </div>
 
                                         <a href="{{ route('avaliacoes.create', ['solicitacao' => $solicitacao->id]) }}"
-                                           class="text-blue-500 hover:underline">Avaliar</a>
+                                           class="text-blue-500 hover:text-blue-700 transition duration-200">Avaliar</a>
                                     </div>
                                 </li>
                             @endforeach

@@ -12,9 +12,15 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden sm:flex sm:ml-10 space-x-8">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Página Inicial') }}
-                    </x-nav-link>
+                    @if (Auth::user()->role === 'cliente')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Página Inicial') }}
+                        </x-nav-link>
+                    @elseif (Auth::user()->role === 'trabalhador')
+                        <x-nav-link :href="route('worker-dashboard')" :active="request()->routeIs('worker-dashboard')">
+                            {{ __('Página Inicial') }}
+                        </x-nav-link>
+                    @endif
 
                     @if (Auth::user()->role === 'cliente' || Auth::user()->role === 'trabalhador')
                         <x-nav-link :href="route('solicitacoes.show')" :active="request()->routeIs('solicitacoes.show')">

@@ -54,14 +54,13 @@ class Solicitacao extends Model
     //Relacionamento com Avaliação
     public function avaliacao()
     {
-        return $this->hasOne(Avaliacao::class);
+        return $this->hasMany(Avaliacao::class);
     }
 
     //Relacionamento com Denuncia
-    //Relacionamento com Avaliação
     public function denuncia()
     {
-        return $this->hasOne(Denuncia::class);
+        return $this->hasMany(Denuncia::class);
     }
 
 

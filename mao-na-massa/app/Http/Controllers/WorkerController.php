@@ -10,11 +10,28 @@ use Illuminate\Support\Facades\Auth;
 class WorkerController extends Controller
 {
     // Exibe a lista de trabalhadores (para o cliente visualizar)
-    public function index()
+    public function index(Request $request)
     {
-        $workers = Worker::with('user')->get(); // Carrega os dados dos usuários associados
+        $search = $request->input('search');
+
+        // Busca os trabalhadores com as avaliações recebidas
+        $workers = Worker::whereHas('user', function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        })
+            ->orWhere('profissao', 'like', "%{$search}%")
+            ->with(['user' => function ($query) {
+                $query->with('avaliacoesRecebidas');
+            }])
+            ->get();
+
+        // Adicionar a média das avaliações para cada trabalhador
+        $workers->each(function ($worker) {
+            $worker->media = $worker->user->avaliacoesRecebidas->avg('nota') ?? 0;
+        });
+
         return view('dashboard', compact('workers'));
     }
+
 
     // Exibe os detalhes de um trabalhador específico
     public function show(Worker $worker)
@@ -26,8 +43,16 @@ class WorkerController extends Controller
     public function solicitarServico(Request $request, Worker $worker)
     {
         $request->validate([
-            'data_inicio' => 'required|date',
-            'data_conclusao' => 'required|date',
+            'data_inicio' => [
+                'required',
+                'date',
+                'after_or_equal:today', // Verifica se a data de início não está no passado
+            ],
+            'data_conclusao' => [
+                'required',
+                'date',
+                'after_or_equal:data_inicio', // Verifica se a data de conclusão é após ou igual à data de início
+            ],
             'descricao' => 'required|string',
         ]);
 
@@ -42,6 +67,7 @@ class WorkerController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Solicitação enviada com sucesso!');
     }
+
 
     // Exibe os detalhes de uma solicitação para o trabalhador
     public function showSolicitacao(Solicitacao $solicitacao)
@@ -72,6 +98,20 @@ class WorkerController extends Controller
         ]);
 
         return redirect()->route('worker-dashboard')->with('success', 'Solicitação atualizada com sucesso!');
+    }
+
+    // Método para carregar o dashboard com a média do cliente
+    public function dashboard()
+    {
+        $worker = Auth::user()->worker;
+
+        $solicitacoes = Solicitacao::where('worker_id', $worker->id)
+            ->with(['cliente' => function ($query) {
+                $query->with('avaliacoesRecebidas');
+            }])
+            ->get();
+
+        return view('worker-dashboard', compact('solicitacoes'));
     }
 
     //Tela de Registro das Solicitações

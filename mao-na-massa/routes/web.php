@@ -20,13 +20,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard do Cliente
     Route::middleware(CheckRole::class . ':cliente')->group(function () {
-        Route::get('/dashboard', function () {
-            $workers = Worker::with('user')->get();
+        // Dashboard com listagem de trabalhadores e funcionalidade de busca
+        Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+            $search = $request->input('search');
+
+            // Realiza a busca pelo nome ou profissão
+            $workers = Worker::with('user')
+                ->whereHas('user', function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('profissao', 'like', "%{$search}%")
+                ->get();
+
             return view('dashboard', compact('workers'));
         })->name('dashboard');
 
-        // Exibir trabalhador e solicitar serviço
+        // Exibir trabalhador
         Route::get('/workers/{worker}', [WorkerController::class, 'show'])->name('workers.show');
+
+        // Solicitar serviço
         Route::post('/workers/{worker}/solicitar', [WorkerController::class, 'solicitarServico'])->name('workers.solicitar');
     });
 
@@ -44,7 +56,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return view('worker-dashboard', compact('solicitacoes'));
     })->middleware(CheckRole::class . ':trabalhador')->name('worker-dashboard');
-
 
     // Concluir solicitação
     Route::patch('/solicitacoes/{solicitacao}/atualizar', [WorkerController::class, 'atualizarSolicitacao'])

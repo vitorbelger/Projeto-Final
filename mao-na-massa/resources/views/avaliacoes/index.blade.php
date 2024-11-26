@@ -13,16 +13,18 @@
 
                     {{-- Exibe o nome e a média do usuário --}}
                     <div class="mb-6">
-                        <p><strong>{{ auth()->user()->name }}</strong></p>
-                        <p><strong>Média de Avaliação:</strong> {{ number_format($media, 1) }} / 5</p>
+                        <p class="text-lg font-semibold">{{ auth()->user()->name }}</p>
+                        <p><strong>Média de Avaliação:</strong>
+                           <span class="text-yellow-500">{{ number_format($media, 1) }} / 5</span>
+                        </p>
                     </div>
 
                     @if ($avaliacoes->isEmpty())
-                        <p>Nenhuma avaliação recebida.</p>
+                        <p class="text-center text-gray-500">Nenhuma avaliação recebida.</p>
                     @else
                         <ul class="space-y-4">
                             @foreach ($avaliacoes as $avaliacao)
-                                <li class="border-b pb-4 mb-4">
+                                <li class="border-b border-gray-300 dark:border-gray-600 py-4">
                                     <div class="flex justify-between items-center">
                                         <div>
                                             <p><strong>Avaliador:</strong> {{ $avaliacao->avaliador->name ?? 'Anônimo' }}</p>

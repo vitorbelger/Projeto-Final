@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'cpf' => ['required', 'string', 'size:11', 'unique:' . User::class],
-            'telefone' => ['required', 'string', 'max:15'],
+            'telefone' => ['required', 'regex:/^\(\d{2}\) \d{5}-\d{4}$/'],
             'endereco' => ['required', 'string', 'max:255'],
             'role' => ['required', Rule::in(['cliente', 'trabalhador'])],
             'profissao' => 'required_if:role,trabalhador|nullable|string|max:255',

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Avaliar Solicitação #{{ $solicitacao->id }}
+            Avaliar Solicitação {{ $solicitacao->id }}
         </h2>
     </x-slot>
 
@@ -13,9 +13,8 @@
                     <p><strong>Nome:</strong>
                         {{ auth()->id() === $solicitacao->user_id ? $solicitacao->worker->user->name : $solicitacao->cliente->name }}
                     </p>
-
-                    @if ($solicitacao->avaliacao)
-                        <p>Esta solicitação já foi avaliada.</p>
+                    @if ($solicitacao->avaliacao->contains('avaliador_id', auth()->id()))
+                        <p>Você já avaliou esta solicitação.</p>
                     @else
                         <form method="POST" action="{{ route('avaliacoes.store', $solicitacao) }}">
                             @csrf

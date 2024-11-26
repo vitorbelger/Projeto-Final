@@ -21,36 +21,43 @@ class DenunciaController extends Controller
 
     public function store(Request $request, Solicitacao $solicitacao)
     {
+        // Carregar os relacionamentos necessários
+        $solicitacao->load('worker.user', 'cliente');
 
-        $denunciaExistente = Denuncia::where('solicitacao_id', $solicitacao->id)->exists();
+        // Verificar se o denunciante já fez uma denúncia para esta solicitação
+        $denunciaExistente = $solicitacao->denuncia()
+            ->where('denunciante_id', Auth::id())
+            ->exists();
+
 
         if ($denunciaExistente) {
             return redirect()->back()->with('error', 'Você já fez uma denúncia para esta solicitação.');
         }
 
+        // Validar o comentário
         $request->validate([
             'comentario' => 'required|string',
         ]);
 
-        $denuncianteId = Auth::id();
+        // Determinar o denunciado
         $denunciadoId = Auth::id() === $solicitacao->user_id
             ? $solicitacao->worker->user_id
             : $solicitacao->user_id;
 
+        // Criar a denúncia
         Denuncia::create([
             'solicitacao_id' => $solicitacao->id,
-            'denunciante_id' => $denuncianteId,
+            'denunciante_id' => Auth::id(),
             'denunciado_id' => $denunciadoId,
             'comentario' => $request->comentario,
         ]);
 
-        // Redirecionar para o dashboard apropriado
-        if (Auth::user()->role === 'cliente') {
-            return redirect()->route('dashboard')->with('success', 'Denúncia registrada com sucesso.');
-        } elseif (Auth::user()->role === 'trabalhador') {
-            return redirect()->route('worker-dashboard')->with('success', 'Denúncia registrada com sucesso.');
-        }
+        // Redirecionar com mensagem de sucesso
+        return redirect()->route(Auth::user()->role === 'cliente' ? 'dashboard' : 'worker-dashboard')
+            ->with('success', 'Denúncia registrada com sucesso.');
     }
+
+
 
     /**
      * Exibe as solicitações finalizadas para o cliente denunciar trabalhadores.
