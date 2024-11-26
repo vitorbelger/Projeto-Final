@@ -1,2 +1,2 @@
 # Projeto-Final
-Repositório do Trabalho Final da Disciplina de Análise e Desenvolvimento de Sistemas 
+Repositório do Trabalho Final do curso de Análise e Desenvolvimento de Sistemas 
